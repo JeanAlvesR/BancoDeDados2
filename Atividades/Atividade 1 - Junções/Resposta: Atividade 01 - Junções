@@ -1,0 +1,41 @@
+Jean Alves Rocha
+
+
+1) 
+
+select livro.isbn, livro.titulo 
+from livro inner join compralivro 
+on livro.isbn = compralivro.isbn and adquirido = false;
+
+
+2)
+
+select livro.titulo, qtde 
+FROM (livro NATURAL JOIN compralivro ) 
+INNER JOIN docente 
+on prof = siape and docente.categoria = 'Adjunto' and adquirido = false;
+
+
+3)
+
+select livro.titulo 
+from (livro NATURAL JOIN compralivro) 
+inner join disciplina 
+on compralivro.coddisc = disciplina.codigo and disciplina.hssem>45 and disciplina.qtdealunos>30;
+
+
+4)
+
+select docente.nome, disciplina.nome 
+from (docente inner join compralivro 
+on siape = prof and adquirido = false and categoria = 'Titular')  
+inner join disciplina 
+on disciplina.codigo = coddisc;
+
+
+5)
+
+select livro.titulo, livro.autor, disciplina.codigo, disciplina.nome 
+from (livro natural join compralivro) 
+inner join disciplina 
+on disciplina.codigo = compralivro.coddisc and disciplina.codigo like 'ES%';
