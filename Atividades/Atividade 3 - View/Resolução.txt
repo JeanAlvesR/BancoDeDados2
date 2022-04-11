@@ -1,0 +1,58 @@
+ATIVIDADE 3 - BANCO DE DADOS 2
+ALUNOS: Jean Alves Rocha
+
+Exercício 1
+
+a)
+CREATE VIEW EngenheirosDepto AS
+	SELECT DISTINCT funcionario.departamento, engenheiro.codigo, engenheiro.nome, engenheiro.salario, engenheiro.especialidade
+	FROM engenheiro, funcionario
+	WHERE engenheiro.codigo = funcionario.codigo
+	ORDER BY funcionario.departamento, engenheiro.nome;
+
+b)
+CREATE VIEW AuxiliaresBilingues AS
+	SELECT DISTINCT auxiliar.codigo, auxiliar.nome, funcionario.departamento
+	FROM funcionario, auxiliar
+	WHERE bilingue=true AND auxiliar.codigo = funcionario.codigo;
+
+c)
+CREATE VIEW ProjetistasSenior AS
+	SELECT DISTINCT projetista.codigo, projetista.nome, projetista.nivel, funcionario.departamento
+	FROM funcionario, projetista
+	WHERE funcionario.codigo = projetista.codigo AND tipo='Senior';
+
+d)
+CREATE VIEW Salarios AS 
+	SELECT engenheiro.nome, engenheiro.salario, departamento FROM engenheiro NATURAL JOIN funcionario
+	UNION 
+	SELECT projetista.nome, projetista.salario, departamento FROM projetista NATURAL JOIN funcionario
+	UNION 
+	SELECT auxiliar.nome, auxiliar.salario, departamento FROM auxiliar NATURAL JOIN funcionario;
+
+Exercício 2
+
+a)
+SELECT DISTINCT nome 
+FROM ProjetistasSenior 
+WHERE nivel = 'A' AND departamento != 'Suporte';
+
+b)
+SELECT EngenheirosDepto.departamento, avg(EngenheirosDepto.salario) as mediaSalario
+FROM EngenheirosDepto
+WHERE EngenheirosDepto.especialidade='Eletricista'
+GROUP BY departamento;
+
+c)
+SELECT departamento 
+FROM AuxiliaresBilingues
+GROUP BY departamento
+INTERSECT 
+SELECT departamento 
+FROM ProjetistasSenior
+GROUP BY departamento;
+
+d)
+SELECT departamento, sum(salario) AS custo 
+FROM salarios
+GROUP BY departamento;
