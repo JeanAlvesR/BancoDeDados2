@@ -1,0 +1,52 @@
+Jean Alves Rocha
+
+
+1)
+
+select docente.nome from docente where categoria = 'Titular' or categoria = 'Adjunto' and siape in (
+	select prof from compralivro where adquirido = 'True')
+except
+select docente.nome from docente inner join compralivro on siape = prof and adquirido = 'false';
+
+
+
+
+2)
+
+select docente.nome, livro.titulo 
+from docente inner join compralivro on prof = siape and adquirido = 'true' 
+natural join livro 
+intersect 
+select docente.nome, livro.titulo 
+from docente inner join compralivro on prof = siape and adquirido = 'false' 
+natural join livro;
+
+
+
+
+3)
+
+select avg(preco) from livro where isbn in (
+select isbn from compralivro where adquirido = 'true'
+group by coddisc, isbn
+having count(*) = 1);
+
+
+
+
+4)
+
+select docente.nome from docente inner join compralivro on siape = prof
+except
+select docente.nome from docente inner join compralivro on siape = prof and compralivro.isbn in(
+	select isbn from livro where preco>200);
+
+
+
+
+5)
+
+--ao invés de eliminar os diferentes, é só eliminar o >, assim não terá duplicados.
+select x.titulo, y.titulo, x.nome from (select * from livro natural join compralivro inner join disciplina on coddisc = codigo) x inner join
+(select * from livro natural join compralivro inner join disciplina on coddisc = codigo) y 
+on  x.nome = y.nome and y.isbn<x.isbn
