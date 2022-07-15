@@ -28,5 +28,21 @@
 #### Views -> Tabela Virtual
 - [x] Create View
 - [x] Select (nomeView)
-####Function and Procedure
-- [x] Criação de Funções e Procedimentos 
+#### Function and Procedure
+- [x] Criação de Funções e Procedimentos
+#### Funções Desvio condicional 
+- [x] IF, ELSE, ELSIF
+#### Tratamento de Exceções
+- [x] Exception -> SQLEXCEPTION
+- [x] Raise Exception
+- [x] Raise Notice
+#### Funções Retorno com SETOF
+- [x] Retorno de um tipo de dado -> Apenas uma coluna
+- [x] Retorno com múltiplos dados -> Tabela completa
+- [x] Retorno com múltiplos dados -> Create type
+#### Triggers
+- [x] BEFORE|AFTER|INSTEAD OF -> ROW e STATEMENT
+- [x] NEW e OLD
+#### Transações
+- [x] Introdução
+
