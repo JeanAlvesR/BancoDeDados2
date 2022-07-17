@@ -1,0 +1,72 @@
+
+
+1)
+
+CREATE TABLE LogDocente(ID SERIAL PRIMARY KEY, DATA TIMESTAMP, Usuario char(30) );
+
+CREATE TRIGGER ControlDocente AFTER INSERT ON
+Docente FOR EACH STATEMENT EXECUTE PROCEDURE controlador();
+
+
+create or replace function controlador() returns trigger as $$
+Begin
+
+	INSERT INTO LogDocente (DATA, Usuario)
+	VALUES (CURRENT_TIMESTAMP, CURRENT_USER);
+
+	return null;
+END; $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER controleRegLog BEFORE DELETE or UPDATE OF Usuario ON
+LogDocente FOR EACH STATEMENT EXECUTE PROCEDURE controladorLog();
+
+create or replace function controladorLog() returns trigger as $$
+begin
+	raise exception 'PARA DE SER MALANDRO! ';
+
+	return null;
+END; $$ LANGUAGE plpgsql;
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx		  
+
+-- 2)
+
+CREATE TRIGGER ValorTotal AFTER INSERT OR UPDATE ON compraLivro 
+FOR EACH STATEMENT EXECUTE PROCEDURE ValorMax();
+
+CREATE OR REPLACE FUNCTION ValorMax() RETURNS TRIGGER AS $$
+
+DECLARE
+	Total FLOAT;
+BEGIN
+	Total := (SELECT Sum(qtde*preco) AS Custo_Total
+			  FROM compralivro INNER JOIN livro
+			  ON compralivro.isbn = livro.isbn AND compralivro.adquirido = false);
+	
+IF Total > 30000 THEN 
+	RAISE EXCEPTION 'O Custo máximo do orçamento não pode ultrapassar 30.000 !';
+END IF;
+
+RETURN NULL;
+END; $$ LANGUAGE plpgsql;
+
+--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx		  
+
+-- 3)
+
+CREATE TRIGGER HoraSemestre AFTER INSERT OR UPDATE ON disciplina
+FOR EACH STATEMENT EXECUTE PROCEDURE HoraCerta();
+
+CREATE OR REPLACE FUNCTION HoraCerta() RETURNS TRIGGER AS $$
+
+BEGIN
+	IF EXISTS (SELECT HsSem
+			  FROM disciplina
+			  WHERE HsSem % 15 != 0) THEN
+		RAISE EXCEPTION 'A quantidade de horas semestrais deve ser multipla de 15!';
+	END IF;
+	
+	RETURN NULL;
+	
+END; $$ LANGUAGE plpgsql;
