@@ -1,0 +1,82 @@
+
+1)
+
+Create type Nome_Salario as (enome Char(30), esalario numeric(6,2));
+
+create or replace function autoresProjeto (nomeP char(30)) returns SETOF Nome_Salario as $$
+Begin
+
+	return QUERY (select enome, esalario 
+		  from empregado natural join projeto
+		   where pnome = nomep
+		  );
+
+END; $$ LANGUAGE PLPGSQL;
+
+2)
+
+create or replace function quantTotalPecas (nomeE char(30)) returns INTEGER as $$
+Begin
+
+	return (Select sum(quant)
+			from fornece_para
+			where pnro in (select pnro
+			  				from empregado
+			  				where enome = nomeE)
+		  	);
+
+END; $$ LANGUAGE PLPGSQL;
+
+select enome, pnome, quantTotalPecas(enome)
+from empregado natural join projeto
+
+3)
+
+create trigger controlEmpregado before update of pnro on empregado
+FOR EACH ROW EXECUTE PROCEDURE controlEmpregado();
+
+create or replace function controlEmpregado() returns trigger as $$
+Declare
+quantEmp INTEGER;
+Begin
+	quantEmp := (select count(*) 
+				 from empregado
+				 where pnro = new.pnro
+	);
+	
+	if quantEmp>3 then
+		new.pnro = old.pnro;
+		raise notice 'A troca de Projeto não foi feita';
+	end if;
+
+	return new;
+
+END; $$ LANGUAGE PLPGSQL;
+
+
+4)
+
+--View 
+create view InfoEmpregados as 
+	select enome, esalario, pnome
+	from empregado natural join projeto
+select * from InfoEmpregados
+
+-- Trigger
+CREATE TRIGGER InsereInfoEmpregados INSTEAD OF
+update ON InfoEmpregados FOR EACH ROW EXECUTE
+PROCEDURE InsereInfoEmpregados();
+
+--Função
+
+CREATE OR REPLACE FUNCTION InsereInfoEmpregados() RETURNS TRIGGER AS $$ 
+DECLARE 
+NroProj CHAR(5);
+BEGIN
+	NroProj := (SELECT pnro FROM projeto WHERE pnome = NEW.pnome);
+		
+	UPDATE empregado SET pnro = NroProj WHERE ENome=NEW.ENome;
+
+	RETURN NEW;
+	
+END;$$ LANGUAGE plpgsql;
