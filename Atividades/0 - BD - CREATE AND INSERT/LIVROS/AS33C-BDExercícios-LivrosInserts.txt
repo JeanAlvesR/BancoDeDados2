@@ -1,0 +1,34 @@
+-- popula a tabela Docente
+insert into Docente(SIAPE,Nome,Categoria) values ('12345678','Paulo Roberto de Paula','Assistente');
+insert into Docente(SIAPE,Nome,Categoria) values ('87654321','Ana Luisa Vilar','Titular');
+insert into Docente(SIAPE,Nome,Categoria) values ('11223344','Antonio Carlos Ribeiro','Adjunto');
+insert into Docente(SIAPE,Nome,Categoria) values ('56784321','Heloisa Ferreira da Costa','Adjunto');
+insert into Docente(SIAPE,Nome,Categoria) values ('43215678','Pedro Camargo','Auxiliar');
+insert into Docente(SIAPE,Nome,Categoria) values ('44332211','João Eduardo de Souza','Titular');
+insert into Docente(SIAPE,Nome,Categoria) values ('32165487','Maria Albuquerque','Titular');
+
+-- popula a tabela Disciplina
+insert into Disciplina(Codigo,Nome,QtdeAlunos,HsSem) values ('AS33C','Banco de Dados 2',30,60);
+insert into Disciplina(Codigo,Nome,QtdeAlunos,HsSem) values ('ES63G','Oficina de Integracao 1',44,75);
+insert into Disciplina(Codigo,Nome,QtdeAlunos,HsSem) values ('AS22B','Banco de Dados 1',30,45);
+insert into Disciplina(Codigo,Nome,QtdeAlunos,HsSem) values ('EC21B','Calculo 1',40,45);
+insert into Disciplina(Codigo,Nome,QtdeAlunos,HsSem) values ('EC11A','Algoritmos',44,90);
+insert into Disciplina(Codigo,Nome,QtdeAlunos,HsSem) values ('ES21F','Qualidade de Software',30,60);
+
+-- popula a tabela Livro
+insert into Livro(ISBN,Titulo,Autor,Preco) values ('85-216-0378-9','Algoritmos e estruturas de dados','GUIMARAES, A. de M.; LAGES, N. A. de C.',189.00);
+insert into Livro(ISBN,Titulo,Autor,Preco) values ('9788576051480','Fundamentos da programação de computadores','GUIMARAES, A. de M.; LAGES, N. A. de C.',189.00);
+insert into Livro(ISBN,Titulo,Autor,Preco) values ('85-88639-17-3','Sistemas de banco de dados','ELMASRI, Ramez; NAVATHE, Shamkant B.',220.00);
+insert into Livro(ISBN,Titulo,Autor,Preco) values ('85-352-1107-8','Sistema de banco de dados','SILBERSCHATZ, A.; KORTH, H. F.; SUDARSHAN, S.',199.90);
+insert into Livro(ISBN,Titulo,Autor,Preco) values ('8535212736','Introdução a sistemas de bancos de dados','DATE, C. J.',90.00);
+insert into Livro(ISBN,Titulo,Autor,Preco) values ('9788588639287','Engenharia de software','SOMMERVILLE, Ian',230.50);
+insert into Livro(ISBN,Titulo,Autor,Preco) values ('8521612591','Um curso de calculo','GUIDORIZZI, Hamilton Luiz',189.00);
+
+-- popula a tabela CompraLivro
+insert into CompraLivro(Prof,CodDisc,ISBN,Qtde,Adquirido) values ('44332211','ES63G','85-88639-17-3',44,true);
+insert into CompraLivro(Prof,CodDisc,ISBN,Qtde,Adquirido) values ('87654321','EC21B','8521612591',80,true);
+insert into CompraLivro(Prof,CodDisc,ISBN,Qtde,Adquirido) values ('32165487','EC11A','9788576051480',88,false);
+insert into CompraLivro(Prof,CodDisc,ISBN,Qtde,Adquirido) values ('11223344','ES21F','9788588639287',30,false);
+insert into CompraLivro(Prof,CodDisc,ISBN,Qtde,Adquirido) values ('44332211','AS33C','85-88639-17-3',15,false);
+insert into CompraLivro(Prof,CodDisc,ISBN,Qtde,Adquirido) values ('44332211','AS22B','85-352-1107-8',30,true);
+insert into CompraLivro(Prof,CodDisc,ISBN,Qtde,Adquirido) values ('12345678','EC11A','85-216-0378-9',44,true);

@@ -1,0 +1,65 @@
+Atividade 04 - Stored Procedures e Funções
+
+1)
+
+CREATE or replace PROCEDURE RegCompraLivro (IN codLivro CHAR(13),IN
+coddisciplina char(5)) AS $$
+BEGIN
+UPDATE compralivro
+SET adquirido = 'true'
+WHERE compralivro.coddisc = coddisciplina and codLivro = compralivro.isbn;
+
+END;$$LANGUAGE PLPGSQL;
+
+
+2)
+
+create or replace Function precoMedio (categoria2 char(20)) returns float as $$
+begin
+
+return (select avg(preco)
+from docente inner join compralivro
+on prof = siape and docente.categoria = categoria2
+natural join livro);
+
+end;
+$$ LANGUAGE PLPGSQL;
+
+
+3)
+
+create or replace Function quantLivro (titulo2 char(20)) returns int as $$
+begin
+
+return (select sum(qtde) from livro inner join compralivro on livro.isbn = compralivro.isbn
+where livro.titulo = titulo2
+);
+
+end;
+$$ LANGUAGE PLPGSQL;
+
+select titulo, quantLivro(titulo) from livro;
+
+
+4)
+
+create or replace Function totalPreco (titulo2 char(20)) returns float as $$
+declare
+precottl Float;
+qtdTotal int;
+begin
+
+precottl:= (select preco from livro where titulo = titulo2);
+
+qtdTotal:= (select sum(qtde)
+from livro natural join compralivro
+where not adquirido and coddisc in (select codigo from disciplina where codigo like 'AS%') and titulo = titulo2)
+;
+return (precottl*qtdtotal);
+
+end;
+$$ LANGUAGE PLPGSQL;
+
+select titulo, totalPreco(titulo) as precoTotal from livro
+group by titulo, totalPreco(titulo)
+having totalPreco(titulo) > 0;
