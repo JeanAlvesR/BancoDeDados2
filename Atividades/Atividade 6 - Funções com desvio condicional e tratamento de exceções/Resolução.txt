@@ -1,0 +1,90 @@
+Banco de Dados - Atividade 6
+
+1)
+
+create or replace function montante(nomeProf char(30)) returns float as $$
+begin
+
+	return (select sum(preco*qtde)
+			from docente inner join compralivro
+			on prof = siape
+			natural join livro
+			where nome = nomeProf);
+	
+end;
+$$ LANGUAGE PLPGSQL; 
+
+select nome, montante(nome) as totalPagar
+from docente inner join compralivro
+on prof = siape
+group by nome
+order by totalPagar;
+
+2)
+
+create or replace function montante(nomeProf char(30)) returns float as $$
+declare
+
+custo float;
+
+begin
+
+	custo := (select sum(preco*qtde)
+			from docente inner join compralivro
+			on prof = siape
+			natural join livro
+			where nome = nomeProf);
+	if custo is null then
+		return 0;
+	end if;
+	
+	return custo;
+end;
+$$ LANGUAGE PLPGSQL; 
+
+select nome, montante(nome) as total from docente;
+
+
+3)
+
+create or replace function montante(nomeProf char(30)) returns float as $$
+
+declare
+
+custo float;
+
+begin
+
+	if not exists (select siape
+	  	from docente 
+	   	where nome = nomeProf)  then
+		RAISE EXCEPTION 'Professor não existe';
+	end if;
+
+	custo := (select sum(preco*qtde)
+			from docente inner join compralivro
+			on prof = siape
+			natural join livro
+			where nome = nomeProf);
+	if custo is null then
+		return 0;
+	end if;
+	
+	return custo;
+end;
+$$ LANGUAGE PLPGSQL; 
+
+4)
+
+CREATE OR REPLACE FUNCTION InsertDocente(siap char(8), nom char(30), cat char(20)) 
+RETURNS boolean
+AS $$
+
+BEGIN		 
+INSERT INTO Docente VALUES (siap, nom, cat);
+RETURN true;
+
+EXCEPTION WHEN SQLSTATE '23514' THEN INSERT INTO Docente VALUES (siap, nom, 'Auxiliar');
+RETURN false;
+
+END; $$ LANGUAGE PLPGSQL;
