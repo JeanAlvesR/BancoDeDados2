@@ -1,0 +1,72 @@
+Alunos:
+
+1)
+
+create or replace function isbnPedidos(nomeDocente char(30)) returns SETOF char(13) as $$
+begin
+
+ return query (select isbn 
+		from docente inner join compralivro
+		on prof=siape
+		where nome = nomeDocente);
+end; $$ LANGUAGE PLPGSQL;
+
+2) 
+
+CREATE TYPE Siape_Nome AS (Siape CHAR(8), NomeProf CHAR(30));
+
+create or replace function SiapeProf(idDisc char(8)) returns SETOF Siape_Nome as $$
+begin
+	IF	 not exists(select codigo
+					from disciplina
+					where idDisc like substring(codigo,1,2)
+				) then
+					Raise exception 'A disciplina não existe!';
+	END IF;
+	
+	return query (select siape, nome
+					from docente
+					except
+					select siape, nome
+					from docente inner join compralivro
+					on prof = siape
+					where coddisc in (
+										select codigo
+										from disciplina
+										where idDisc like substring(codigo,1,2)
+									));
+end; $$ LANGUAGE PLPGSQL;
+
+3)
+
+CREATE TYPE Disc AS (codigo CHAR(5), nome char(30), qtdealunos INTEGER, hssem INTEGER);
+
+CREATE OR REPLACE FUNCTION inserirDisc(codigoD CHAR(5), nomeD char(30), qtdealunosD INTEGER, hssemD INTEGER)
+RETURNS SETOF Disc AS $$
+
+BEGIN
+
+	IF hssemD%15 != 0
+		THEN
+			RAISE EXCEPTION 'NÃO SE ACEITA CARGA HORÁRIO QUE NÃO SEJA MULTIPLA DE 15';
+	END IF;
+
+	BEGIN --exception
+		INSERT INTO disciplina VALUES (codigoD, nomeD, qtdealunosD, hssemD);
+		RETURN QUERY (select * 
+					  from disciplina
+					 where codigo = codigoD);
+					 
+		EXCEPTION WHEN SQLSTATE '23505' THEN 
+			BEGIN --bloco para o tratamento
+			
+			INSERT INTO disciplina VALUES ('XXXXX', nomeD, qtdealunosD, hssemD);
+			RETURN QUERY (select * 
+					  from disciplina
+					 where codigo = 'XXXXX');
+					 
+			END; -- fim do bloco para o tratamento
+
+	END; --exception
+
+END; $$ LANGUAGE PLPGSQL;
