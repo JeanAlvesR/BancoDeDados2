@@ -1,0 +1,87 @@
+BANCO DE DADOS 2
+ATIVIDADE 9 - TRIGGER - NEW / OLD
+
+
+
+-- 1)
+
+CREATE TABLE LogExcDocente(ID SERIAL PRIMARY KEY, DATA TIMESTAMP, Usuario char (30) , Siape char (8), Nome char(30), Categoria char(20));
+	
+create trigger ControleExclusao before delete on docente for each row execute procedure LogExclusao();
+	
+create or replace function LogExclusao()returns trigger as $$
+begin
+	
+	insert into LogExcDocente (data, usuario, siape, nome, categoria) values (current_timestamp, current_user, old.siape, old.nome, old.categoria);
+	return old;
+	
+end; $$ Language plpgsql;
+
+--
+
+create trigger ControleLogExc before update or delete on LogExcDocente for each row execute procedure LogExcLogReg();
+
+create or replace function LogExcLogReg() returns trigger as $$
+begin
+	
+	RAISE NOTICE 'A alteração no Log não é permitida';
+	insert into LogExcDocente (data, usuario, siape, nome, categoria) values (current_timestamp, current_user, 'ERRO', 'ERRO', null);
+	return null;
+		
+end; $$ language plpgsql;
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+--2)
+
+CREATE TRIGGER ControleCompraLivro BEFORE UPDATE or insert ON CompraLivro
+FOR EACH ROW EXECUTE PROCEDURE verificaCompraLivro();
+								   
+create or replace function verificaCompraLivro() returns trigger as $$
+declare
+	precolivro numeric;
+begin
+	
+	precolivro := (select preco from livro where isbn = new.isbn);
+
+	if (old is null) then
+		begin
+			if (New.qtde * precolivro>17000) then
+				raise notice 'Inserção não autorizada. Limite de custo de 17000';
+				return null;
+			return new;
+			end if;
+		end;
+	end if;
+	
+	if(New.qtde * precolivro)>17000 then
+				begin
+				raise notice 'A quantidade não foi alterada. Limite de custo de 17000';
+				New.qtde = Old.qtde;
+				end;
+	end if;
+	
+	return new;
+
+end; $$ language plpgsql;
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+--3)
+
+create trigger triggerDisc before insert or update of hssem on disciplina
+FOR EACH ROW EXECUTE PROCEDURE verificaCargaH();
+
+create or replace function verificaCargaH() returns trigger as $$
+begin
+	if new.hssem%15 !=0 then
+		new.hssem = new.hssem - new.hssem%15;
+	end if;
+
+	return new;
+end; $$ language plpgsql;
+
